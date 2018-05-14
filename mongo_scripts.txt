@@ -1,0 +1,265 @@
+1) mongoimport --host=127.0.0.1 --db usersDB --collection users users.json
+use usersDB
+2) db.users.aggregate([
+    {
+        "$group": { 
+            "_id": null, 
+            "avg": { "$avg": "$age" } 
+        }
+    }
+]);
+
+{
+    "_id" : null,
+    "avg" : 30.3886255924171
+}
+
+3) db.users.aggregate([
+    { "$match": {
+        "address": {$regex: 'Alaska'}
+    }},
+    {
+        "$group": { 
+            "_id": null, 
+            "avg": { "$avg": "$age" } 
+        }
+    }
+]);
+
+{
+    "_id" : null,
+    "avg" : 31.5
+}
+
+4) var avgAge = db.users.aggregate([
+    {
+        "$group": { 
+            "_id": null, 
+            "avg": { "$avg": "$age" } 
+        }
+    }
+]).toArray()[0]["avg"];
+
+var avgAlaskaAge = db.users.aggregate([
+    { "$match": {
+        "address": {$regex: 'Alaska'}
+    }},
+    {
+        "$group": { 
+            "_id": null, 
+            "avg": { "$avg": "$age" } 
+        }
+    }
+]).toArray()[0]["avg"];
+    
+var avgCeilAge = Math.ceil((avgAlaskaAge + avgAge)/2);
+  
+db.users.aggregate([
+    { "$unwind": "$friends" },
+    { "$match": {
+        "age": {$gte: avgCeilAge},
+        "friends.name": {$regex: /^Dennis/}
+        }
+     },
+     { $limit : 1 },
+     { $project : { name : 1 , _id : 1 } } 
+])
+
+
+{
+    "_id" : ObjectId("5adf3c1544abaca147cdd34b"),
+    "name" : "Macias Shannon"
+}
+
+5)var avgAge = db.users.aggregate([
+    {
+        "$group": { 
+            "_id": null, 
+            "avg": { "$avg": "$age" } 
+        }
+    }
+]).toArray()[0]["avg"];
+
+var avgAlaskaAge = db.users.aggregate([
+    { "$match": {
+        "address": {$regex: 'Alaska'}
+    }},
+    {
+        "$group": { 
+            "_id": null, 
+            "avg": { "$avg": "$age" } 
+        }
+    }
+]).toArray()[0]["avg"];
+    
+var avgCeilAge = Math.ceil((avgAlaskaAge + avgAge)/2);
+  
+var mansState = db.users.aggregate([
+    { "$unwind": "$friends" },
+    { "$match": {
+        "age": {$gte: avgCeilAge},
+        "friends.name": {$regex: /^Dennis/}
+        }
+     },
+     { $limit : 1 },
+     { $project : { address : 1 } } 
+]).toArray()[0]["address"].split(",")[2];
+     
+db.users.aggregate([
+ { "$match": {
+        "address": {$regex: mansState}
+    }},
+    {"$group": {
+        _id: "$favoriteFruit",
+        count:{$sum:1}
+        }},
+     {$sort:{count:-1}},
+     {$limit:1} 
+   
+]); 
+    /* 1 */
+{
+    "_id" : "strawberry",
+    "count" : 14.0
+}
+6) var avgAge = db.users.aggregate([
+    {
+        "$group": { 
+            "_id": null, 
+            "avg": { "$avg": "$age" } 
+        }
+    }
+]).toArray()[0]["avg"];
+
+var avgAlaskaAge = db.users.aggregate([
+    { "$match": {
+        "address": {$regex: 'Alaska'}
+    }},
+    {
+        "$group": { 
+            "_id": null, 
+            "avg": { "$avg": "$age" } 
+        }
+    }
+]).toArray()[0]["avg"];
+    
+var avgCeilAge = Math.ceil((avgAlaskaAge + avgAge)/2);
+  
+var mansState = db.users.aggregate([
+    { "$unwind": "$friends" },
+    { "$match": {
+        "age": {$gte: avgCeilAge},
+        "friends.name": {$regex: /^Dennis/}
+        }
+     },
+     { $limit : 1 },
+     { $project : { address : 1 } } 
+]).toArray()[0]["address"].split(",")[2];
+     
+var fruit = db.users.aggregate([
+ { "$match": {
+        "address": {$regex: mansState}
+    }},
+    {"$group": {
+        _id: "$favoriteFruit",
+        count:{$sum:1}
+        }},
+     {$sort:{count:-1}},
+     {$limit:1} 
+   
+]).toArray()[0]["_id"]; 
+     db.users.aggregate([
+    { "$match": {
+        "favoriteFruit": fruit
+    }},
+    {
+       $project: {
+          name: 1,
+          date: {
+             $dateFromString: {
+                dateString: '$registered',
+            
+             }
+          }
+       }
+    },
+     {$sort:{registered:-1}},
+     {$limit:1}  
+   ])
+
+/* 1 */
+{
+    "_id" : ObjectId("5adf3c1544abaca147cdd34e"),
+    "name" : "Hester Bradley",
+    "date" : ISODate("2014-09-19T07:41:41.000Z")
+}
+6)var avgAge = db.users.aggregate([
+    {
+        "$group": { 
+            "_id": null, 
+            "avg": { "$avg": "$age" } 
+        }
+    }
+]).toArray()[0]["avg"];
+
+var avgAlaskaAge = db.users.aggregate([
+    { "$match": {
+        "address": {$regex: 'Alaska'}
+    }},
+    {
+        "$group": { 
+            "_id": null, 
+            "avg": { "$avg": "$age" } 
+        }
+    }
+]).toArray()[0]["avg"];
+    
+var avgCeilAge = Math.ceil((avgAlaskaAge + avgAge)/2);
+  
+var mansState = db.users.aggregate([
+    { "$unwind": "$friends" },
+    { "$match": {
+        "age": {$gte: avgCeilAge},
+        "friends.name": {$regex: /^Dennis/}
+        }
+     },
+     { $limit : 1 },
+     { $project : { address : 1 } } 
+]).toArray()[0]["address"].split(",")[2];
+     
+var fruit = db.users.aggregate([
+ { "$match": {
+        "address": {$regex: mansState}
+    }},
+    {"$group": {
+        _id: "$favoriteFruit",
+        count:{$sum:1}
+        }},
+     {$sort:{count:-1}},
+     {$limit:1} 
+   
+]).toArray()[0]["_id"]; 
+var firstUser =  db.users.aggregate([
+    { "$match": {
+        "favoriteFruit": fruit
+    }},
+    {
+       $project: {
+          name: 1,
+          date: {
+             $dateFromString: {
+                dateString: '$registered',
+            
+             }
+          }
+       }
+    },
+     {$sort:{registered:-1}},
+     {$limit:1},  
+     {$project: {name:1, id:1}}
+   ]);
+     db.user.update({name: firstUser.name}, {$set:{ features: 'first apple eater' } },{upsert: 1} )
+     
+
+7) db.getCollection('users').remove({"favoriteFruit": "strawberry"}) 
+253
